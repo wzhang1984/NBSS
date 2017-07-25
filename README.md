@@ -1,1 +1,1 @@
-# Supervised_Random_Walk
+# Supervised Random Walk
