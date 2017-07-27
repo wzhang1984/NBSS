@@ -3,9 +3,9 @@
 # Supervised Random Walk
 # Author: Wei Zhang
 # 06/21/2017
-####################################################################################################
-
-####################################################################################################
+#
+# v0.2 added L-FGBS algorithm for the training 07/26/2017
+#
 # Reference: https://arxiv.org/pdf/1011.4071.pdf
 # However, this package has a different objective function:
 # J = lam*||w||**2 + sum_over_u_and_v(y*sum((pu-pv)**2))
@@ -17,6 +17,8 @@
 import numpy as np
 import os
 from collections import Counter
+import functools
+from scipy.optimize import fmin_l_bfgs_b
 
 # Read edges and edge features from a file
 # Return edges (e by 2) and features (e by w), 
@@ -24,18 +26,18 @@ from collections import Counter
 # Note: (i, j) and (j, i) should be 2 lines in the input file, 
 # with different features
 def load_network(file_name, output_dir=''):
-    # Load graph
+    # Load a graph
     print "* Loading network..."
     gene_pairs = []
     features = []
     gene_set = set()
     with open(file_name) as file_handle:
-        for line in file_handle.read().splitlines():
-            a = line.split()
-            gene_pairs.append([a[0],a[1]])
-            features.append(a[2:])
-            gene_set.add(a[0])
-            gene_set.add(a[1])
+        for line in file_handle:
+            row = line.split('\t')
+            gene_pairs.append([row[0],row[1]])
+            features.append(row[2:])
+            gene_set.add(row[0])
+            gene_set.add(row[1])
             
     index_map = ''
     gene2index = {}
@@ -53,10 +55,12 @@ def load_network(file_name, output_dir=''):
     edges = [[gene2index[i] for i in gene_pair] for gene_pair in gene_pairs]
     return edges, features, gene2index
 
-# Return edge strength (vector) calculated by a logistic function
+
+# Return the edge strength (vector) calculated by a logistic function
 # Inputs: edge features (e by w) and edge feature weights (vector w)
 def logistic_edge_strength(features, w):
     return  1.0 / (1+np.exp(-np.dot(features, w)))
+
 
 # Calculate the gradient of edge strength functioin with
 # respect to edge feature weights, returns a matrix of gradients (e by w)
@@ -67,11 +71,13 @@ def strength_gradient(features, edge_strength):
     nfeatures = features.shape[1]
     return np.multiply(features, np.repeat(logistic_slop, nfeatures, axis=1))
 
+
 # Normalize a matrix by row sums,
 # return a normalized matrix
 def renorm(M):    
     rowSum = np.sum(M, axis=1)
     return np.array(M).astype(float)/rowSum[:,np.newaxis]
+
 
 # This function takes edges (e by 2), edge features (e by w), 
 # edge feature weights (vector w), and the number of nodes,
@@ -120,6 +126,7 @@ def generate_Q_and_gradient(edges, nnodes, features, w):
     
     return Q, Q_grad
 
+
 ####################################################################################################
 # *** The fllowing 2 functions calculate Q and unweighted Q, 
 # without calculating the gradient
@@ -143,6 +150,7 @@ def generate_Q_unweighted(edges, nnodes):
     return Q
 ####################################################################################################
 
+
 # This function takes a normalized transition matrix Q (n by n), 
 # initial state P_init (m by n), and reset probability,
 # then use iteration to find the personalized PageRank at convergence.
@@ -157,6 +165,7 @@ def iterative_PPR(Q, P_init, rst_prob):
         P = P_new
         P_new =  (1-rst_prob)*np.dot(P, Q) + rst_prob*P_init
     return P_new
+
 
 # This function takes PPR scores P (m by n), transition matrix Q (n by n), 
 # and partial derivatives of Q with respect to edge feature weights Q_grad (w by n by n), 
@@ -180,11 +189,13 @@ def P_grad_1_iter(rst_prob, P_grad, Q, P, Q_grad):
         P_grad_new[i,:,:] = (1-rst_prob) * (np.dot(P_grad[i,:,:], Q)+np.dot(P, Q_grad[i,:,:]))
     return P_grad_new
 
+
 # This is the cost function:
 # given 2 lines of propagated scores pu and pv,
 # return sum((pu-pv)**2), which is a scalar
 def cost_func(pu, pv):
     return np.sum(np.square(pu-pv))
+
 
 # This is the gradient of the cost function
 # with respect to (pu-pv):
@@ -193,15 +204,15 @@ def cost_func(pu, pv):
 def cost_func_gradient(pu, pv):
     return 2 * (pu-pv)
 
+
 # This is the objective function to be minimized
 # Supervised Random Walk PageRank scores are calculated based on 
 # input network and features, then cost function value is calculated 
 # according to the derived pagerank scores. 
 # (returns a scalar)
-# Equation: J = lam*||w||**2 + sum_over_u_and_v(y*sum((pu-pv)**2)/z_uv*z_sum)
-# where y = 1 if u and v belong to the same group, otherwise y = 0
-# z_uv is the total number of comparisons in the group where u and v belongs to,
-# z_sum is the total number of comparisons in all groups
+# Equation: J = lam*||w||**2 + sum_over_u_and_v(y*sum((pu-pv)**2)/z_uv)
+# where y = 1 if u and v belong to the same group, otherwise y = 0;
+# z_uv is the total number of comparisons in the group where u and v belongs to
 # Inputs: P (m by n), group labels (length m vector), 
 # regularization parameter labmda, and edge feature weights (vector w)
 def obj_func(P, group_lables, group2npairs, lam, w):
@@ -212,20 +223,20 @@ def obj_func(P, group_lables, group2npairs, lam, w):
         for v in range(u+1, npats):
             if group_lables[u] == group_lables[v]:
                 group = group_lables[u]
-                cost += cost_func(P[u,:], P[v,:]) / group2npairs[group] * group2npairs['sum']
+                cost += cost_func(P[u,:], P[v,:]) / group2npairs[group]
     
     # Calculate the L2 norm squared of edge feature weights
     norm = np.dot(w, w)
     
     return lam*norm + cost
 
+
 # This is the gradient of the objective function
 # Equation: J_grad = lam*2*w 
-#                    + sum_over_u_and_v(y*(pu_grad-pv_grad).*(2*(pu-pv))/z_uv*z_sum)
+#                    + sum_over_u_and_v(y*(pu_grad-pv_grad).*(2*(pu-pv))/z_uv)
 # where y = 1 if u and v belong to the same group, otherwise y = 0;
-# z_uv is the total number of comparisons in the group where u and v belongs to,
-# z_sum is the total number of comparisons in all groups
-# Q, Q_grad, P, P_grad are provided to dirive J_grad
+# z_uv is the total number of comparisons in the group where u and v belongs to
+# Q, Q_grad, P, P_grad are provided to derive J_grad
 # (J_grad is a vector with the length of w)
 def obj_func_gradient(Q, Q_grad, P, P_grad, group_lables, group2npairs, lam, w):
     # Compute the gradient of cost function with respect to edge feature weights w
@@ -243,14 +254,32 @@ def obj_func_gradient(Q, Q_grad, P, P_grad, group_lables, group2npairs, lam, w):
                 # Equation: cost_grad = (pu_grad-pv_grad) .* cost_func_grad
                 # Dimension: (w by n) .* (n by 1) = (w by 1)
                 cost_grad += np.dot((P_grad[:,u,:]-P_grad[:,v,:]),
-                                    cost_func_grad) / group2npairs[group] * group2npairs['sum']
+                                    cost_func_grad) / group2npairs[group]
     
     # Calculate the gradient of the L2 norm term
     norm_grad = 2 * w
     
     return lam*norm_grad + cost_grad
 
-# This function sequentially calculate Q, Q_grad, P, P_grad to derive J and J_grad
+
+# For each group, calculate the number of sample-pairs 
+# for normalization in the objective function
+def count_numbers_per_group(group_lables):
+    group2nsamples = Counter(group_lables)
+    group2npairs = {}
+    sum_npairs_withingroup = 0
+    for group in group2nsamples:
+        group2npairs[group] = 0.5 * group2nsamples[group] * (group2nsamples[group]-1)
+        sum_npairs_withingroup += group2npairs[group]
+    nsamples = len(group_lables)
+    group2npairs['diff'] = 0.5*nsamples*(nsamples-1) - sum_npairs_withingroup
+    return group2npairs
+    
+####################################################################################################
+# This part of code uses gradient descent to minimize the objective function
+####################################################################################################
+
+# This wrapper function sequentially calculate Q, Q_grad, P, P_grad to derive J and J_grad
 def calculate_J_and_gradient(edges, features, nnodes, P_init, rst_prob, group_lables, lam, w):
     # Generate transition matrix Q (n by n), and its gradient Q_grad (w by n by n)
     # according to edge features and weights
@@ -260,27 +289,24 @@ def calculate_J_and_gradient(edges, features, nnodes, P_init, rst_prob, group_la
     # Calculate the gradient of PPR (w by m by n)
     P_grad = iterative_P_gradient(P, Q, Q_grad, rst_prob)
     # For each group, calculate the number of sample-pairs 
-    # to compute the squared loss
-    group2nsamples = Counter(group_lables)
-    group2npairs = {}
-    group2npairs['sum'] = 0
-    for group in group2nsamples:
-        group2npairs[group] = 0.5 * group2nsamples[group] * (group2nsamples[group]-1)
-        group2npairs['sum'] += group2npairs[group]
+    # to normalize in the objective function
+    group2npairs = count_numbers_per_group(group_lables)
     # Calculate objective function J (scalar), 
     # and its gradient J_grad (length w vector)
     J = obj_func(P, group_lables, group2npairs, lam, w)
     J_grad = obj_func_gradient(Q, Q_grad, P, P_grad, group_lables, group2npairs, lam, w)
     return J, J_grad
 
+
 # This function trains the edge feature weights of Supervised Random Walk
 # using gradient descent functions
 # Inputs: edges (e by 2), edge features (e by w), number of nodes,
 # initial state P_init (m by n), reset probability, group labels (length m vector), 
 # regularization parameter labmda, 
-# standard deviation of initial edge feature weights, learning rate, and momentum
+# standard deviation of initial edge feature weights, learning rate, 
+# and the function for updating parameters
 def train_SRW_GD(edges, features, nnodes, P_init, rst_prob, group_lables, lam,
-                 w_init_sd=0.01, learning_rate=0.1, update_w_func='Nadam', **kwargs):
+                 w_init_sd=0.01, learning_rate=0.1, update_w_func='Adam', **kwargs):
     # t is the iteration counter
     t = 0
     # Initialize edge feature weights from a Gaussian distribution, 
@@ -315,6 +341,7 @@ def train_SRW_GD(edges, features, nnodes, P_init, rst_prob, group_lables, lam,
     
     return w
 
+
 # This is a wrapper function for updating parameters, called by train_SRW_GD
 # It changes w, m, n, PI_mu_t, v in place
 def update_w(func, w, J_grad, learning_rate, m, n, t, PI_mu_t, v, **kwargs):
@@ -327,8 +354,8 @@ def update_w(func, w, J_grad, learning_rate, m, n, t, PI_mu_t, v, **kwargs):
     elif func == 'momentum':
         w[:], v[:] = update_w_momentum(w, J_grad, learning_rate, v, **kwargs)
 
-####################################################################################################
-# *** Below are four functions for parameter updates
+
+# *** Below are four functions for parameter updates:
 
 # This function uses momentum to accelerate gradient descent
 def update_w_momentum(w, J_grad, learning_rate, v, momentum=0.9):
@@ -379,6 +406,58 @@ def update_w_Nadam(w, J_grad, learning_rate, m, n, t, PI_mu_t, eps=1e-8, beta1=0
     m_bar = mu_next*m_hat + (1-mu_t)*J_grad_hat # Nesterov
     w += -learning_rate*m_bar / (np.sqrt(n_hat)+eps)
     return w, m, n, PI_mu_t
+
+
+####################################################################################################
+# This part of code uses L-FGBS to minimize the objective function
+####################################################################################################
+
+# This wrapper function sequentially calculate Q and P to derive J
+def calculate_J(edges, features, nnodes, P_init, rst_prob, group_lables, group2npairs, lam, w):
+    # Generate transition matrix Q (n by n) according to edge features and weights
+    Q = generate_Q(edges, nnodes, features, w)
+    # Calculate Personalized PageRank (PPR)
+    P = iterative_PPR(Q, P_init, rst_prob)
+    # Calculate objective function J (scalar)
+    J = obj_func(P, group_lables, group2npairs, lam, w)
+    return J
+
+
+# This wrapper function sequentially calculate Q, Q_grad, P, P_grad to derive J and J_grad
+def calculate_J_gradient(edges, features, nnodes, P_init, rst_prob, group_lables, group2npairs, lam, w):
+    # Generate transition matrix Q (n by n), and its gradient Q_grad (w by n by n)
+    # according to edge features and weights
+    Q, Q_grad = generate_Q_and_gradient(edges, nnodes, features, w)
+    # Calculate Personalized PageRank (PPR)
+    P = iterative_PPR(Q, P_init, rst_prob)
+    # Calculate the gradient of PPR (w by m by n)
+    P_grad = iterative_P_gradient(P, Q, Q_grad, rst_prob)
+    # Calculate the gradient of the objective function J_grad (length w vector)
+    J_grad = obj_func_gradient(Q, Q_grad, P, P_grad, group_lables, group2npairs, lam, w)
+    return J_grad
+
+
+# This function trains the edge feature weights of Supervised Random Walk using L-BFGS
+# Inputs: edges (e by 2), edge features (e by w), number of nodes,
+# initial state P_init (m by n), reset probability, group labels (length m vector), 
+# regularization parameter labmda, and standard deviation of initial edge feature weights
+def train_SRW_BFGS(edges, features, nnodes, P_init, rst_prob, group_lables, lam, w_init_sd=0.01):
+    # Initialize edge feature weights from a Gaussian distribution, 
+    # with standard deviation w_init_sd
+    w_init = np.random.normal(scale = w_init_sd, size = features.shape[1])
+    # For each group, calculate the number of sample-pairs 
+    # to normalize in the objective function
+    group2npairs = count_numbers_per_group(group_lables)
     
+    # scipy's L-BFGS-B optimizer is called to iteratively optimize J
+    # J and J_grad are the main input to the BFGS optimizer
+    # functools.partial is used to generate partial functions of J and J_grad 
+    # with only one free argument w
+    w, J, d = fmin_l_bfgs_b(functools.partial(calculate_J, edges, features, nnodes, P_init, rst_prob,
+                                              group_lables, group2npairs, lam), w_init,
+                            fprime = functools.partial(calculate_J_gradient, edges, features, nnodes,
+                                                       P_init, rst_prob, group_lables, group2npairs, lam))
+    
+    return w, J, d
 
 
