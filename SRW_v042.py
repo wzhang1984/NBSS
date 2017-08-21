@@ -712,7 +712,7 @@ class SRW_solver(object):
     def init_w(self):
         self.w = np.random.normal(scale=self.w_init_sd, size=self.nfeatures)
         if self.strength_func == 'ReLU':
-            self.w[self.w<=1e-8] = 1e-8
+            self.w += 1
         
     
     # This function maps edge feature weights with their names
@@ -858,6 +858,8 @@ class SRW_solver(object):
         print 'finished calculating J and J_grad:', time.strftime("%H:%M:%S")
         
         if self.eval_sil and self.loss != 'silhouette':
+            if self.C is None:
+                self.C = self.centroid(P.toarray(), self.ngroups, self.group2indeces_list)
             self.eval_sil_wrapper(P, 'train')
         
         return J, J_grad
@@ -906,7 +908,7 @@ class SRW_solver(object):
         self.w, v, m, n, PI_mu_t = update_w(self.update_w_func, self.w, J_grad, self.learning_rate, 
                                             m, n, t, PI_mu_t, v, **kwargs)
         if self.strength_func == 'ReLU':
-            self.w[self.w<=1e-8] = 1e-8
+            self.w[self.w<=1e-16] = 1e-16
         # Update J and J_grad for the first time
         J_new, J_grad = self.calc_J_Jgrad_wrapper(self.w, t)
 
@@ -917,7 +919,7 @@ class SRW_solver(object):
             self.w, v, m, n, PI_mu_t = update_w(self.update_w_func, self.w, J_grad, 
                                                 self.learning_rate, m, n, t, PI_mu_t, v, **kwargs)
             if self.strength_func == 'ReLU':
-                self.w[self.w<=1e-8] = 1e-8
+                self.w[self.w<=1e-16] = 1e-16
             # Update J and J_grad
             J_new, J_grad = self.calc_J_Jgrad_wrapper(self.w, t)
             
@@ -935,8 +937,9 @@ class SRW_solver(object):
     def train_SRW_BFGS(self):
         if self.loss == 'silhouette':
             print 'BFGS does not work on "Silhouette" loss. Please use gradient descent instead'
-            return '', '', ''
-
+        if self.strength_func == 'ReLU':
+            print 'BFGS is not supported for ReLU. Please use gradient descent instead'
+            
         # scipy's L-BFGS-B optimizer is called to iteratively optimize J
         # the function returning J and J_grad is the main input of the BFGS optimizer
         self.w, J, d = fmin_l_bfgs_b(self.calculate_J_and_gradient, self.w)
