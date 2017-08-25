@@ -1,7 +1,5 @@
 # Supervised Random Walk  
 
-![This image illustrates SRW](./images/BRCA.gif)
-
 **[equations_v043.ipynb](./equations_v043.ipynb) This is a document containing equations in Supervised Random Walk**  
 
 [SRW_v043.py](./SRW_v043.py) contains the functions for Supervised Random Walk  
@@ -11,3 +9,8 @@
 [data_processing.ipynb](./data_processing.ipynb) contains the code for processing PathwayCommons edge features and Breast Cancer tumor mutation data  
 
 [SRW_cookbook_BRCA.ipynb](./SRW_cookbook_BRCA.ipynb) contains some example code for classifying Breast Cancer samples into five known subtypes   
+
+**The following animation illustrates how Supervised Random Walk works**
+
+![This image illustrates SRW](./images/BRCA.gif)
+
