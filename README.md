@@ -1,8 +1,8 @@
 # Supervised Random Walk  
 
-**[equations.ipynb](./equations.ipynb) This is a document containing equations in Supervised Random Walk**  
+**[equations_v043.ipynb](./equations_v043.ipynb) This is a document containing equations in Supervised Random Walk**  
 
-[SRW_v042.py](./SRW_v042.py) contains the functions for Supervised Random Walk  
+[SRW_v043.py](./SRW_v043.py) contains the functions for Supervised Random Walk  
 
 [test.ipynb](./test.ipynb) contains two toy examples for testing the partial derivatives and the gradient descent functions  
   
