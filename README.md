@@ -1,6 +1,6 @@
 # Supervised Random Walk  
 
-![text](./images/BRCA.gif)
+![This image illustrates SRW](./images/BRCA.gif)
 
 **[equations_v043.ipynb](./equations_v043.ipynb) This is a document containing equations in Supervised Random Walk**  
 
