@@ -1,6 +1,6 @@
 # Supervised Random Walk  
 
-**[equations_v043.ipynb](./equations_v043.ipynb) This is a document containing equations in Supervised Random Walk**  
+**This [document](./equations_v043.ipynb) contains equations in Supervised Random Walk**  
 
 
 [SRW_v043.py](./SRW_v043.py) contains the functions for Supervised Random Walk  
