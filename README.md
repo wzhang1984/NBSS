@@ -1,8 +1,4 @@
 # Supervised Random Walk  
-
-**The following animation illustrates how Supervised Random Walk works**  
-![This image illustrates SRW](./images/BRCA_copy.gif)  
-  
   
 **[This document](./equations_v044.ipynb) contains equations in Supervised Random Walk**  
   
@@ -13,4 +9,5 @@
 [SRW_cookbook_BRCA.ipynb](./SRW_cookbook_BRCA.ipynb) contains some example code for classifying Breast Cancer samples into four known subtypes   
 
 
-
+**The following animation illustrates how Supervised Random Walk works**  
+![This image illustrates SRW](./images/BRCA.gif)  
