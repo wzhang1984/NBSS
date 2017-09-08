@@ -10,5 +10,5 @@
 
 
 **The following animation illustrates how Supervised Random Walk works**  
-![This image illustrates SRW](./images/BRCA.gif)
+![This image illustrates SRW](./images/BRCA_copy.gif)
 
