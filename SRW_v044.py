@@ -1,12 +1,14 @@
 
 ####################################################################################################
-# Supervised Random Walk
+# Network-Based Supervised Stratification (NBS^2)
 # Author: Wei Zhang
 # 06/21/2017
 ####################################################################################################
 #
-# Reference: https://arxiv.org/pdf/1011.4071.pdf
-# However, this package has a different objective function.
+# We develop an general algorithmic framework by adapting the Supervised Random Walk (SRW) 
+# algorithm (Backstrom and Leskovec, 2010, https://arxiv.org/pdf/1011.4071.pdf) with a novel loss 
+# function designed specifically for cancer subtype classification.
+#
 # The goal is to minimize the distance of samples within each group
 # and maximize the distance between groups
 #
@@ -29,8 +31,8 @@
 # Used group centroids of the training set to calculate accuracy 08/16/2017
 # v0.4.3 removed ReLU; added a WMW cost function 08/21/2017
 # v0.4.4 (current) fixed a bug in 'WMW' loss. 09/08/2017
-# now the true group cencer does NOT include the sample that is currently being evaluated
-# removed all loss functions except for 'WMW'.
+# Now the true group cencer does NOT include the sample that is currently being evaluated
+# Removed all loss functions except for 'WMW'. Removed redundant code.
 #
 ####################################################################################################
 
