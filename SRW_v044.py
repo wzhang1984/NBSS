@@ -29,7 +29,7 @@
 # Used group centroids of the training set to calculate accuracy 08/16/2017
 # v0.4.3 removed ReLU; added a WMW cost function 08/21/2017
 # v0.4.4 (current) fixed a bug in 'WMW' loss. 09/08/2017
-# now the true group cencer does NOT include the sample that is currently veing evaluated
+# now the true group cencer does NOT include the sample that is currently being evaluated
 # removed all loss functions except for 'WMW'.
 #
 ####################################################################################################
@@ -147,7 +147,7 @@ def logistic_strength_gradient(features, edge_strength):
 # Normalize a matrix by row sums,
 # return a normalized matrix
 def renorm(M):
-    return csr_matrix(M / M.sum(axis=1))
+    return csr_matrix(M / (M.sum(axis=1)+1e-8))
 
 
 # This function takes edges (e by 2), edge features (e by w), 
@@ -387,6 +387,25 @@ def cost_func_WMW(nsamples, ngroups, P, C, sample2groupid_list, b=0.5):
         cost += cost_u
     return cost, accuracy
 
+# This function calculates the confusion matrix
+@jit(nopython=True)
+def calc_confusion_matrix(nsamples, ngroups, P, C, sample2groupid_list):
+    P_dot_CT = np.dot(P, C.T) # m by g
+    C_dot_CT = np.dot(C, C.T) # g by g
+    confusion_matrix = np.zeros((ngroups,ngroups))
+    for u in range(nsamples):
+        i = sample2groupid_list[u]
+        j_min = i
+        dist_min = 2.
+        for j in range(ngroups):
+            dist_uj = -2*P_dot_CT[u,j] + C_dot_CT[j,j]
+            if dist_uj < dist_min:
+                j_min = j
+                dist_min = dist_uj
+        j = j_min
+        confusion_matrix[i,j] += 1
+    return confusion_matrix
+
 
 ####################################################################################################
 # These are functions used in the building stage of the SRW class
@@ -488,9 +507,8 @@ class SRW_solver(object):
     # Initialize global variables
     def __init__(self, edges, features, nnodes, P_init, rst_prob, group_labels, lam, w_init_sd=0.01, 
                  w=None, feature_names=[], sample_names=[], node_names=[], loss='WMW', 
-                 norm_type='L1', maximize_diff=False, learning_rate=0.1, update_w_func='Adam', 
-                 P_init_val=None, group_labels_val=None, ncpus=-1, maxit=1000, early_stop=None, 
-                 WMW_b=5e-4):
+                 norm_type='L1', learning_rate=0.1, update_w_func='Adam', P_init_val=None, 
+                 group_labels_val=None, ncpus=-1, maxit=1000, early_stop=None, WMW_b=2e-4):
         self.edges = edges                 # Edges in the network (e by 2, int, ndarray)
         self.features = features           # Edge features (e by w, float, csc_matrix)
         self.nnodes = nnodes               # Number of nodes in the network (int)
@@ -507,7 +525,6 @@ class SRW_solver(object):
         self.group_labels_val = group_labels_val # Group labels of validation samples (m by 1, str/int, list)
         
         # This part creat some lists for calculating group centroids
-        # maximize_diff: Whether to maximaze the difference between groups (bool)
         (self.group2indeces_list, self.sample2groupid_list, 
          self.group2nsamples_list) = sample_groupid_args(group_labels)
         # Validation set
@@ -613,8 +630,8 @@ class SRW_solver(object):
                                                                     self.group2nsamples_list, 
                                                                     self.WMW_b)
             self.accuracy = self.accuracy / self.nsamples
-            print M_opponent
-            print M_opponent_trunc
+            # print M_opponent
+            # print M_opponent_trunc
             self.M_opponent.append(M_opponent)
             self.M_opponent_trunc.append(M_opponent_trunc)
             
@@ -685,7 +702,8 @@ class SRW_solver(object):
         self.calc_cost_and_acc_val()
         print '***', t, 'iteration: J is', J, 'cost_val is', self.cost_val
         print '*** accuracy is', self.accuracy, 'accuracy_val is', self.accuracy_val
-        print w_local, '\n'
+        # print w_local, '\n'
+        print '\n'
         self.cost_val_list.append(self.cost_val)
         self.w_list.append(w_local.copy())
         return J, J_grad
