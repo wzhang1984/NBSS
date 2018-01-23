@@ -6,7 +6,7 @@ We develop a general algorithmic framework by adapting the Supervised Random Wal
   
 ## The package
   
-* [__SRW_v044__](./SRW_v044.py). This software package contains all the functions of NBS^2.  
+* [__SRW_v044__](./SRW_v044.py) This software package contains all the functions of NBS^2.  
   
 ## Analysis scripts
   
