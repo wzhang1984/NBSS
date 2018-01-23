@@ -22,7 +22,7 @@ We develop a general algorithmic framework by adapting the Supervised Random Wal
   
 ## Figures
   
-|                                                                                             | |
+| | |
 |:---:|:---:|
 | ![Fig. 1](./images/Figure_1_method.PNG) | ![Fig. 2](./images/Figure_2_simulation.PNG) |
 | ![Fig. 3](./images/Figure_BRCA_learning_curve.PNG) | ![Fig. 4](./images/Figure_BRCA_subnets.PNG) |
