@@ -4,7 +4,7 @@
   
 We develop a general algorithmic framework by adapting the Supervised Random Walk (SRW) algorithm (Backstrom and Leskovec, 2010) with a novel loss function designed specifically for cancer subtype classification. The package is called **Network-Based Supervised Stratification (NBS^2)**.  
   
-## The NBS^2 package
+## The package
   
 * ([__SRW_v044.py__](./SRW_v044.py)). This software package contains all the functions of NBS^2.  
   
