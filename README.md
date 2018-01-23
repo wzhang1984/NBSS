@@ -1,15 +1,27 @@
 # Classifying tumors by supervised network propagation   
+
+## Software overview
+  
 We develop an general algorithmic framework by adapting the Supervised Random Walk (SRW) algorithm (Backstrom and Leskovec, 2010) with a novel loss function designed specifically for cancer subtype classification. The package is called **Network-Based Supervised Stratification (NBS^2)**.  
   
+## The NBS^2 package
   
-**This is the _main package_ ([SRW_v044.py](./SRW_v044.py)).** It contains all the functions of NBS^2.  
+* ([__SRW_v044.py__](./SRW_v044.py)). This software package contains all the functions of NBS^2.  
   
-This file ([simulation_100x1000.ipynb](./simulation_100x1000.ipynb)) contains the code for the simulation (**Fig. 2**).  
-This file ([data_processing_BRCA.ipynb](./data_processing_BRCA.ipynb)) contains the code for processing PathwayCommons interaction features and Breast Cancer mutation profiles.  
-This file ([SRW_cookbook_BRCA.ipynb](./SRW_cookbook_BRCA.ipynb)) contains some example code for classifying Breast Cancer samples into four known subtypes.   
+## Analysis scripts
   
-This document ([equations_v044.ipynb](./equations_v044.ipynb)) contains equations of the algorithm.  
-
+* ([__simulation_100x1000.ipynb__](./simulation_100x1000.ipynb)) Script to perform the simulation (**Fig. 2**).  
+  
+* ([__data_processing_BRCA.ipynb__](./data_processing_BRCA.ipynb)) Script to processes PathwayCommons interaction features and Breast Cancer mutation profiles.  
+  
+* ([__SRW_cookbook_BRCA.ipynb__](./SRW_cookbook_BRCA.ipynb)) Run the NBS^2 package to classify breast cancer subtypes.   
+  
+## Equations
+  
+* ([equations_v044.ipynb](./equations_v044.ipynb)) This document contains equations of the algorithm.  
+  
+## Figures
+  
 ![Fig. 1](./images/Figure_1_method.PNG)  
 **Fig. 1. Workflow of the Network-Based Supervised Stratification (NBS^2) of cancer subtypes.** NBS^2 takes three input data sets, represented by red arrows: 1) a molecular network where each edge is annotated by a set of features *x*, and each feature is assigned a initial weight *w*; 2) a tumor-by-gene matrix representing the mutation profile of a cohort; and 3) the defined subtype of each tumor. In each iteration, NBC compute an activation score a for each edge (**Eq. 3**), calculate a transition matrix *Q* (**Eq. 2**), perform a random walk (**Eq. 1**), and compute the value of the cost function *J*(*w*) (**Eq. 4**). Training the classifier is conducted iteratively using gradient descent. To minimize *J*(*w*), the algorithm calculates the partial derivative of *J*(*w*) with respect to the edge feature weights *w* using the chain rule (**Eqs. 7-11**), and updates *w* accordingly. Upon convergence, the algorithm outputs the final feature weights *w*, transition matrix *Q* and propagated mutation profiles *P*, which together defines the classification model.  
   
