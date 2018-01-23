@@ -6,7 +6,7 @@
 ####################################################################################################
 #
 # We develop an general algorithmic framework by adapting the Supervised Random Walk (SRW) 
-# algorithm (Backstrom and Leskovec, 2010, https://arxiv.org/pdf/1011.4071.pdf) with a novel loss 
+# algorithm (Backstrom and Leskovec, 2010; https://arxiv.org/pdf/1011.4071.pdf) with a novel loss 
 # function designed specifically for cancer subtype classification.
 #
 # The goal is to minimize the distance of samples within each group
