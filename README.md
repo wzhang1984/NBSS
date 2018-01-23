@@ -6,19 +6,19 @@ We develop a general algorithmic framework by adapting the Supervised Random Wal
   
 ## The package
   
-* ([__SRW_v044.py__](./SRW_v044.py)). This software package contains all the functions of NBS^2.  
+* [__SRW_v044.py__](./SRW_v044.py). This software package contains all the functions of NBS^2.  
   
 ## Analysis scripts
   
-* ([__simulation_100x1000.ipynb__](./simulation_100x1000.ipynb)) Script to perform the simulation (**Fig. 2**).  
+* [__simulation_100x1000.ipynb__](./simulation_100x1000.ipynb) Script to perform the simulation (**Fig. 2**).  
   
-* ([__data_processing_BRCA.ipynb__](./data_processing_BRCA.ipynb)) Script to processes PathwayCommons interaction features and Breast Cancer mutation profiles.  
+* [__data_processing_BRCA.ipynb__](./data_processing_BRCA.ipynb) Script to processes PathwayCommons interaction features and Breast Cancer mutation profiles.  
   
-* ([__SRW_cookbook_BRCA.ipynb__](./SRW_cookbook_BRCA.ipynb)) Run the NBS^2 package to classify breast cancer subtypes.   
+* [__SRW_cookbook_BRCA.ipynb__](./SRW_cookbook_BRCA.ipynb) Run the NBS^2 package to classify breast cancer subtypes.   
   
 ## Equations
   
-* ([equations_v044.ipynb](./equations_v044.ipynb)) This document contains equations of the algorithm.  
+* [equations_v044.ipynb](./equations_v044.ipynb) This document contains equations of the algorithm.  
   
 ## Figures
   
