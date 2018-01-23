@@ -22,10 +22,10 @@ We develop a general algorithmic framework by adapting the Supervised Random Wal
   
 ## Figures
   
-| | |
-|:---:|:---:|
-| ![Fig. 1](./images/Figure_1_method.PNG) | ![Fig. 2](./images/Figure_2_simulation.PNG) |
-| ![Fig. 3](./images/Figure_BRCA_learning_curve.PNG) | ![Fig. 4](./images/Figure_BRCA_subnets.PNG) |
+| | | |
+|:---:|:---:|:---:|
+| ![Fig. 1](./images/Figure_1_method.PNG) |   | ![Fig. 2](./images/Figure_2_simulation.PNG) |
+| ![Fig. 3](./images/Figure_BRCA_learning_curve.PNG) |   | ![Fig. 4](./images/Figure_BRCA_subnets.PNG) |
   
 ## Figure legends
 **Fig. 1. Workflow of the Network-Based Supervised Stratification (NBS^2) of cancer subtypes.** NBS^2 takes three input data sets, represented by red arrows: 1) a molecular network where each edge is annotated by a set of features *x*, and each feature is assigned a initial weight *w*; 2) a tumor-by-gene matrix representing the mutation profile of a cohort; and 3) the defined subtype of each tumor. In each iteration, NBC compute an activation score a for each edge (**Eq. 3**), calculate a transition matrix *Q* (**Eq. 2**), perform a random walk (**Eq. 1**), and compute the value of the cost function *J*(*w*) (**Eq. 4**). Training the classifier is conducted iteratively using gradient descent. To minimize *J*(*w*), the algorithm calculates the partial derivative of *J*(*w*) with respect to the edge feature weights *w* using the chain rule (**Eqs. 7-11**), and updates *w* accordingly. Upon convergence, the algorithm outputs the final feature weights *w*, transition matrix *Q* and propagated mutation profiles *P*, which together defines the classification model.  
@@ -34,4 +34,4 @@ We develop a general algorithmic framework by adapting the Supervised Random Wal
   
 **Fig. 3. Performance of breast cancer subtypes classification.** Values of cost function (left y-axis) and classification accuracy (right y-axis) are plotted against the number of iterations of NBC on the (**A**) training data and (**B**) validation data. Dash line indicates the accuracy of tumor stratification based on unsupervised random walk and non-propagated mutation profiles on the validation data.
   
-**Fig. 4. Subnetworks of breast cancer subtypes.** Subnetworks characterizing breast cancer subtypes extracted from Pathway Commons by NBC, defined as a set of genes with significantly different network-transformed scores between different subtypes (ANOVA FDR < 0.05) and their molecular interactions with higher than average activation scores (> 0.01) learned from NBC.
+**Fig. 4. Subnetworks of breast cancer subtypes.** Subnetworks characterizing breast cancer subtypes extracted from Pathway Commons by NBC, defined as a set of genes with significantly different network-transformed scores between different subtypes (ANOVA FDR < 0.05) and their molecular interactions with higher than average activation scores (> 0.01) learned from NBC. The pie chart represents the relative ratio of the average propagated mutation score for the four subtypes. For example, the large cyan area on _ERBB2_ represents that its average propagation score is much higher in HER2 tumors than other subtypes.
