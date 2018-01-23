@@ -22,6 +22,7 @@ We develop a general algorithmic framework by adapting the Supervised Random Wal
   
 ## Figures
   
+| | |
 |:-------------------------:|:-------------------------:|
 | ![Fig. 1](./images/Figure_1_method.PNG) | ![Fig. 2](./images/Figure_2_simulation.PNG) |
   
