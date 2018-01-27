@@ -1,2 +1,2 @@
 
-## This folder contains the sample data for the NBS<sup>2<\sup>
+## This folder contains example input data for  NBS<sup>2</sup>
