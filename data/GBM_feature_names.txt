@@ -1,0 +1,66 @@
+Adherens junction
+Apoptosis
+B cell receptor signaling pathway
+BIND
+BioGRID
+CDKN2A_source
+CDKN2A_target
+CORUM
+CTD
+Cell cycle
+Cytokine-cytokine receptor interaction
+DIP
+ECM-receptor interaction
+EGFR_source
+EGFR_target
+ESC proliferation
+Epithelial-mesenchymal transition
+ErbB signaling pathway
+Focal adhesion
+HPRD
+HumanCyc
+INOH
+IntAct
+Jak-STAT signaling pathway
+KEGG
+MAPK signaling pathway
+MSigDB
+Multi-Drug Resistance Factors
+Natural killer cell mediated cytotoxicity
+NetPath
+PANTHER
+PDGFRA_source
+PDGFRA_target
+PTEN_source
+PTEN_target
+Pathways in cancer
+PhosphoSite
+Reactome
+Recon X
+SMPDB
+T cell receptor signaling pathway
+TP53_source
+TP53_target
+VEGF signaling pathway
+Wnt signaling pathway
+catalysis-precedes_d
+catalysis-precedes_rev
+controls-expression-of_d
+controls-expression-of_rev
+controls-phosphorylation-of_d
+controls-phosphorylation-of_rev
+controls-state-change-of_d
+controls-state-change-of_rev
+controls-transport-of_d
+controls-transport-of_rev
+fisherp_source
+fisherp_target
+in-complex-with
+inflammatory response
+interacts-with
+mTOR signaling pathway
+mutrate_source
+mutrate_target
+mutual_exclusive
+p53 signaling pathway
+pid
