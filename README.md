@@ -1,9 +1,14 @@
-# Classifying tumors by supervised network propagation   
-
-## Software overview
+# Classifying tumors by supervised network propagation  
+(see [paper](https://academic.oup.com/bioinformatics/article/34/13/i484/5045745))  
   
-We develop a general algorithmic framework by adapting the Supervised Random Walk (SRW) algorithm (Backstrom and Leskovec, 2010) with a novel loss function designed specifically for cancer subtype classification. The package is called Network-Based Supervised Stratification (NBS<sup>2</sup>).  
+## Abstract
   
+__Motivation:__ Network propagation has been widely used to aggregate and amplify the effects of tumor mutations using knowledge of molecular interaction networks. However, propagating mutations through interactions irrelevant to cancer leads to erosion of pathway signals and complicates the identification of cancer subtypes.  
+  
+__Methods:__ To address this problem we introduce a propagation algorithm, Network-Based Supervised Stratification (NBS<sup>2</sup>), which learns the mutated subnetworks underlying tumor subtypes using a supervised approach. Given an annotated molecular network and reference tumor mutation profiles for which subtypes have been predefined, NBS<sup>2</sup> is trained by adjusting the weights on interaction features such that network propagation best recovers the provided subtypes. After training, weights are fixed such that mutation profiles of new tumors can be accurately classified.  
+  
+__Results:__ We evaluate NBS<sup>2</sup> on breast and glioblastoma tumors, demonstrating that it outperforms the best network-based approaches in classifying tumors to known subtypes for these diseases. By interpreting the interaction weights, we highlight characteristic molecular pathways driving selected subtypes.  
+    
 ## The package
   
 * [__SRW_v044__](./SRW_v044.py) This software package contains all the functions of NBS<sup>2</sup>.  
