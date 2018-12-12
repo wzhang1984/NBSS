@@ -1,5 +1,4 @@
-# Classifying tumors by supervised network propagation  
-(see [paper](https://academic.oup.com/bioinformatics/article/34/13/i484/5045745))  
+# Classifying tumors by supervised network propagation (see [paper](https://academic.oup.com/bioinformatics/article/34/13/i484/5045745))  
   
 ## Abstract
   
