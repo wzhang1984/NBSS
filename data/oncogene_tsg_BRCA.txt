@@ -1,0 +1,7 @@
+IGF1R	Oncogene
+AKT2	Oncogene
+AKT3	Oncogene
+PAK1	Oncogene
+IKBKB	Oncogene
+CCNE1	Amplification_Oncogene
+TERT	Amplification_Oncogene
